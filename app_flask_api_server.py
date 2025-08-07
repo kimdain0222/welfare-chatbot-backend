@@ -22,7 +22,7 @@ def get_policies_by_region(region):
                 "benefits": "월 30만원 주거비 지원",
                 "conditions": "20-30대 청년, 소득 기준 하위 80%",
                 "application_period": "2024.01.01 ~ 2024.12.31",
-                "url": "https://www.seoul.go.kr/policy/youth-housing"
+                "url": "https://www.seoul.go.kr/policy"
             },
             {
                 "id": 2,
@@ -30,7 +30,7 @@ def get_policies_by_region(region):
                 "benefits": "취업 성공 시 100만원 지원",
                 "conditions": "25-35세 청년, 실업 상태",
                 "application_period": "2024.01.01 ~ 2024.12.31",
-                "url": "https://www.seoul.go.kr/policy/youth-employment"
+                "url": "https://www.seoul.go.kr/policy"
             }
         ],
         "gyeonggi": [
@@ -40,7 +40,7 @@ def get_policies_by_region(region):
                 "benefits": "창업 자금 최대 500만원 지원",
                 "conditions": "20-40대 청년, 창업 계획서 제출",
                 "application_period": "2024.01.01 ~ 2024.12.31",
-                "url": "https://www.gg.go.kr/policy/youth-startup"
+                "url": "https://www.gg.go.kr/policy"
             }
         ],
         "incheon": [
@@ -50,7 +50,7 @@ def get_policies_by_region(region):
                 "benefits": "문화 활동비 월 10만원 지원",
                 "conditions": "20-30대 청년, 인천 거주",
                 "application_period": "2024.01.01 ~ 2024.12.31",
-                "url": "https://www.incheon.go.kr/policy/youth-culture"
+                "url": "https://www.incheon.go.kr/policy"
             }
         ]
     }
@@ -76,7 +76,7 @@ def get_all_policies():
                 "benefits": "월 30만원 주거비 지원",
                 "conditions": "20-30대 청년, 소득 기준 하위 80%",
                 "application_period": "2024.01.01 ~ 2024.12.31",
-                "url": "https://www.seoul.go.kr/policy/youth-housing"
+                "url": "https://www.seoul.go.kr/policy"
             }
         ],
         "gyeonggi": [
@@ -86,7 +86,7 @@ def get_all_policies():
                 "benefits": "창업 자금 최대 500만원 지원",
                 "conditions": "20-40대 청년, 창업 계획서 제출",
                 "application_period": "2024.01.01 ~ 2024.12.31",
-                "url": "https://www.gg.go.kr/policy/youth-startup"
+                "url": "https://www.gg.go.kr/policy"
             }
         ],
         "incheon": [
@@ -96,7 +96,7 @@ def get_all_policies():
                 "benefits": "문화 활동비 월 10만원 지원",
                 "conditions": "20-30대 청년, 인천 거주",
                 "application_period": "2024.01.01 ~ 2024.12.31",
-                "url": "https://www.incheon.go.kr/policy/youth-culture"
+                "url": "https://www.incheon.go.kr/policy"
             }
         ]
     }
