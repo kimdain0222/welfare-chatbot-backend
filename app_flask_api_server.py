@@ -1,9 +1,19 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+import sqlite3
 import json
 
 app = Flask(__name__)
 CORS(app, origins=['https://welfarechatbot02.netlify.app', 'http://localhost:3000'])  # React에서 API 호출할 수 있도록 CORS 설정
+
+# DB 파일 경로
+DB_PATH = "welfare_policies.db"
+
+def get_db_connection():
+    """데이터베이스 연결"""
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row  # 딕셔너리 형태로 결과 반환
+    return conn
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
@@ -12,105 +22,75 @@ def health_check():
 
 @app.route('/api/policies/region/<region>', methods=['GET'])
 def get_policies_by_region(region):
-    """지역별 정책 조회 (테스트용)"""
-    # 테스트용 정책 데이터
-    test_policies = {
-        "seoul": [
-            {
-                "id": 1,
-                "title": "서울 청년 주거 지원",
-                "benefits": "월 30만원 주거비 지원",
-                "conditions": "20-30대 청년, 소득 기준 하위 80%",
-                "application_period": "2024.01.01 ~ 2024.12.31",
-                "url": "https://www.seoul.go.kr/policy"
-            },
-            {
-                "id": 2,
-                "title": "서울 청년 취업 지원",
-                "benefits": "취업 성공 시 100만원 지원",
-                "conditions": "25-35세 청년, 실업 상태",
-                "application_period": "2024.01.01 ~ 2024.12.31",
-                "url": "https://www.seoul.go.kr/policy"
-            }
-        ],
-        "gyeonggi": [
-            {
-                "id": 3,
-                "title": "경기 청년 창업 지원",
-                "benefits": "창업 자금 최대 500만원 지원",
-                "conditions": "20-40대 청년, 창업 계획서 제출",
-                "application_period": "2024.01.01 ~ 2024.12.31",
-                "url": "https://www.gg.go.kr/policy"
-            }
-        ],
-        "incheon": [
-            {
-                "id": 4,
-                "title": "인천 청년 문화 지원",
-                "benefits": "문화 활동비 월 10만원 지원",
-                "conditions": "20-30대 청년, 인천 거주",
-                "application_period": "2024.01.01 ~ 2024.12.31",
-                "url": "https://www.incheon.go.kr/policy"
-            }
-        ]
-    }
+    """지역별 정책 조회"""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT id, title, url, region, age_range, application_period, conditions, benefits
+            FROM welfare_policies
+            WHERE region = ?
+            ORDER BY title
+        ''', (region,))
+        
+        policies = []
+        for row in cursor.fetchall():
+            policy = dict(row)
+            if policy['age_range']:
+                policy['age_range'] = json.loads(policy['age_range'])
+            else:
+                policy['age_range'] = []
+            policies.append(policy)
+        
+        conn.close()
+        return jsonify({
+            "success": True,
+            "region": region,
+            "count": len(policies),
+            "policies": policies
+        })
     
-    policies = test_policies.get(region, [])
-    
-    return jsonify({
-        "success": True,
-        "region": region,
-        "count": len(policies),
-        "policies": policies
-    })
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
 
 @app.route('/api/policies', methods=['GET'])
 def get_all_policies():
-    """모든 정책 조회 (테스트용)"""
-    all_policies = []
-    test_policies = {
-        "seoul": [
-            {
-                "id": 1,
-                "title": "서울 청년 주거 지원",
-                "benefits": "월 30만원 주거비 지원",
-                "conditions": "20-30대 청년, 소득 기준 하위 80%",
-                "application_period": "2024.01.01 ~ 2024.12.31",
-                "url": "https://www.seoul.go.kr/policy"
-            }
-        ],
-        "gyeonggi": [
-            {
-                "id": 2,
-                "title": "경기 청년 창업 지원",
-                "benefits": "창업 자금 최대 500만원 지원",
-                "conditions": "20-40대 청년, 창업 계획서 제출",
-                "application_period": "2024.01.01 ~ 2024.12.31",
-                "url": "https://www.gg.go.kr/policy"
-            }
-        ],
-        "incheon": [
-            {
-                "id": 3,
-                "title": "인천 청년 문화 지원",
-                "benefits": "문화 활동비 월 10만원 지원",
-                "conditions": "20-30대 청년, 인천 거주",
-                "application_period": "2024.01.01 ~ 2024.12.31",
-                "url": "https://www.incheon.go.kr/policy"
-            }
-        ]
-    }
+    """모든 정책 조회"""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT id, title, url, region, age_range, application_period, conditions, benefits
+            FROM welfare_policies
+            ORDER BY region, title
+        ''')
+        
+        policies = []
+        for row in cursor.fetchall():
+            policy = dict(row)
+            if policy['age_range']:
+                policy['age_range'] = json.loads(policy['age_range'])
+            else:
+                policy['age_range'] = []
+            policies.append(policy)
+        
+        conn.close()
+        return jsonify({
+            "success": True,
+            "count": len(policies),
+            "policies": policies
+        })
     
-    for region, policies in test_policies.items():
-        for policy in policies:
-            policy["region"] = region
-            all_policies.append(policy)
-    
-    return jsonify({
-        "success": True,
-        "count": len(all_policies),
-        "policies": all_policies
-    })
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
 
 if __name__ == '__main__':
     print("🚀 복지정책 API 서버 시작...")
